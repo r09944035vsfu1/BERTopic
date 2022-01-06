@@ -150,6 +150,8 @@ class BERTopic:
 
         # Embedding model
         self.language = language if not embedding_model else None
+        if embedding_model == None:
+            raise ValueError("Need to pass Embedding model!!")
         self.embedding_model = embedding_model
 
         # Vectorizer
@@ -278,7 +280,7 @@ class BERTopic:
         documents = pd.DataFrame({"Document": documents,
                                   "ID": range(len(documents)),
                                   "Topic": None})
-
+        """ Only accpet pre-computed corpus embeddings and embedding model
         # Extract embeddings
         if embeddings is None:
             self.embedding_model = select_backend(self.embedding_model,
@@ -291,7 +293,7 @@ class BERTopic:
             if self.embedding_model is not None:
                 self.embedding_model = select_backend(self.embedding_model,
                                                       language=self.language)
-
+        """
         # Reduce dimensionality with UMAP
         if self.seed_topic_list is not None and self.embedding_model is not None:
             y, embeddings = self._guided_topic_modeling(embeddings)
@@ -1338,9 +1340,9 @@ class BERTopic:
             documents = [documents]
 
         if method == "word":
-            embeddings = self.embedding_model.embed_words(documents, verbose)
+            embeddings = self.embedding_model.encode(documents, show_progress_bar=verbose) #self.embedding_model.embed_words(documents, verbose)
         elif method == "document":
-            embeddings = self.embedding_model.embed_documents(documents, verbose)
+            embeddings = self.embedding_model.encode(documents, show_progress_bar=verbose)#self.embedding_model.embed_documents(documents, verbose)
         else:
             raise ValueError("Wrong method for extracting document/word embeddings. "
                              "Either choose 'word' or 'document' as the method. ")
